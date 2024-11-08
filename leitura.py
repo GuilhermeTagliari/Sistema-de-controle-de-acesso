@@ -9,7 +9,6 @@ try:
     print("Aproxime o cartão RFID...")
     rfid_tag, _ = reader.read()
     rfid_tag_value = str(rfid_tag).strip()
-    print(f"Tag lida: {rfid_tag_value}")
 
     try:
         response = requests.post('http://10.1.24.123:8080/autenticar', json={'rfid_tag': rfid_tag_value})
@@ -23,9 +22,14 @@ try:
         else:
             print("Redirecionando para o painel de usuário...")
     
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 403:
+            print("Usuário desconhecido. Acesso negado.")
+        else:
+            print(f"Erro ao conectar com a API: {e}")
     except requests.exceptions.RequestException as e:
         print(f"Erro ao conectar com a API: {e}")
-        
+    
     while True:
         print("Digite 'ler' para ler novamente (ou 'sair' para encerrar):")
         user_input = input().strip().lower()
